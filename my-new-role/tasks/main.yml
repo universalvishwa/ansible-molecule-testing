@@ -1,0 +1,7 @@
+---
+# tasks file for my-new-role
+- name: print the distribution and version
+  debug: msg="{{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+- name: print the OS family
+  debug: msg="{{ ansible_os_family }}"
