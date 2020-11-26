@@ -9,7 +9,7 @@ Example for Ansible role testing with Molecule, Testinfra and Linters.
     - sdfsdfsd
     - sdfsdfsd
     - sdfsdsv
-- Most of the role testing aspect functionality is converged around the `Molecule` tool.
+- Most of the Ansible role testing functionality is converged around the `Molecule` tool.
 - `Molecule` is designed to automate all parts of Ansible role testing.
 
 
@@ -30,7 +30,6 @@ Example for Ansible role testing with Molecule, Testinfra and Linters.
     $ python3 -m pip install molecule-docker
     ```
 
-
 ## Step-by-Step instructions
 1. Initialize a new role with Molecule
     - Can create a new Ansible role using Molecule _**OR**_
@@ -48,36 +47,28 @@ Example for Ansible role testing with Molecule, Testinfra and Linters.
 #### Molecule Commands
 All these commands should be run inside the role directory.
 - **Testing role with default test matrix**
-
-Better suited to test a role once it’s complete rather than in developing phase.
+    - Better suited to test a role once it’s complete rather than in developing phase.
     ```bash
     $ molecule test
     ```
-
 - **Run playbooks in molecule test environment**
-
-Converge step allows to re-run the playbook on the test molecule instance without needing to create/destroy the instances every time. This allows to test the role rapidly test the role development workflow to allow for the fastest possible iterations.
+    - Converge step allows to re-run the playbook on the test molecule instance without needing to create/destroy the instances every time. This allows to test the role rapidly test the role development workflow to allow for the fastest possible iterations.
     ```bash
     $ molecule converge
     ```
-
 - **Destroy molecule test instance**
-
-Tears down an existing molecule test instance already running.
+    - Tears down an existing molecule test instance already running.
     ```bash
     $ molecule destroy
     ```
-
 - **Run unit testing on playbook run**
-
-Enables to run unit tests against molecule test instance.
+    - Enables to run unit tests against molecule test instance.
     ```bash
     $ molecule verify
     ```
 
 - **Log into molecule instance**
-
-Manually inspect the molecule test instance during testing.
+    - Manually inspect the molecule test instance during testing.
     ```bash
     $ molecule login
     ```
