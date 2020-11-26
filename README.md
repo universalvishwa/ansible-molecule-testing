@@ -1,14 +1,14 @@
 # Ansible Molecule Testing
-Example for Ansible role testing with Molecule, Testinfra and Linters.
+Example for Ansible role testing with Molecule, Testinfra and Linters to do Unit, integration and functional testing.
 
 ## Overview
-- This repository contains details on how to test an Ansible role using over a number of aspects,
-    - sdfsd
-    - sdfsdf
-    - sdfdsfwe
-    - sdfsdfsd
-    - sdfsdfsd
-    - sdfsdsv
+- Ansible testing spectram: This repository contains details on how to test an Ansible role using over a number of aspects,
+    - yamllint
+    - ansible-playbook --syntax-check
+    - ansible-lint
+    - molecule test
+    - ansible-playbook --check
+    - Parallel infrastructure
 - Most of the Ansible role testing functionality is converged around the `Molecule` tool.
 - `Molecule` is designed to automate all parts of Ansible role testing.
 
@@ -74,7 +74,26 @@ All these commands should be run inside the role directory.
     $ molecule login
     ```
 
+### Notes
+- Importing roles from Ansible Galaxy
+    - Can install Ansible Galaxy roles into a global location in the system such that the role can be shared by other Ansible playboooks.
+        `ansible-galaxy install <galaxy_role_name>` OR
+    - Install the Galaxy role in the same directory as the playbook. Create a `ansible.cfg` file in the root for the Ansible role.
+        ```ini
+        [default]
+        nocows = True
+        roles_path = ./roles
+        ```
+    - When `roles_path` is overridden, use a `requirements.yml` file to define the Ansible Galaxy roles to download.
+        ```bash
+        $ ansible-galaxy install -r requirements.yml
+        ```
+- Patterns:
+    1. `debug` module to display results and messages to verify certain checkpoints in the playbooks execution.
+    2. `fail` and `assert` module can be used to validate assertions under conditions, fail over conditions.
 
 ## References
 - [Ansible Molecule](https://molecule.readthedocs.io/en/latest/)
+- [Ansible 101 - Episode 7 - Molecule Testing and Linting and Ansible Galaxy](https://youtu.be/FaXVZ60o8L8)
+- [Ansible 101 - Episode 8 - Playbook testing with Molecule and GitHub Actions CI](https://youtu.be/CYghlf-6Opc)
 - [Rapidly Build & Test Ansible Roles with Molecule + Docker](https://www.toptechskills.com/ansible-tutorials-courses/rapidly-build-test-ansible-roles-molecule-docker/)

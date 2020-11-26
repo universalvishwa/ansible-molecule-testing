@@ -1,0 +1,25 @@
+---
+# Using Debug, Assert and Fail module to validate conditions and prompt messages.
+- name: Using Debug, Assert and Fail module
+  hosts: 127.0.0.1
+  gather_facts: false
+  connection: local
+  vars:
+    ansible_ver: 2.10.3
+    fail_module_value: false
+    assert_module_value: false
+  tasks:
+    - name: Verify minimum Ansible version requirements.
+      assert:
+        that: "ansible_version.full is version_compare('{{ ansible_ver }}', '>=')"
+        msg: >
+          "Supported minimum Ansible version is {{ ansible_ver }}. Update Ansible to at least {{ ansible_ver }} to run the playbook."
+    - name: Fails if conditions warrent failure.
+      fail:
+        msg: "Everything just failed."
+      when: fail_module_value != true
+    - name: Conditional assertions.
+      assert:
+        that:
+          - fail_module_value != true
+          - assert_module_value != true    
