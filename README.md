@@ -24,12 +24,11 @@ Example for Ansible role testing with Molecule, Testinfra and Linters.
     ```bash
     $ pip3 install -r requirements.txt 
     ```
-
 - [Optional] Can setup this in Molecule testing in a Python *Virtual environment*. When doing so, install the `molecule-docker` package.
-```bash
-$ pip3 install -r requirements.txt 
-$ python3 -m pip install molecule-docker
-```
+    ```bash
+    $ pip3 install -r requirements.txt 
+    $ python3 -m pip install molecule-docker
+    ```
 
 
 ## Step-by-Step instructions
@@ -49,30 +48,35 @@ $ python3 -m pip install molecule-docker
 #### Molecule Commands
 All these commands should be run inside the role directory.
 - **Testing role with default test matrix**
+
 Better suited to test a role once it’s complete rather than in developing phase.
     ```bash
     $ molecule test
     ```
 
 - **Run playbooks in molecule test environment**
+
 Converge step allows to re-run the playbook on the test molecule instance without needing to create/destroy the instances every time. This allows to test the role rapidly test the role development workflow to allow for the fastest possible iterations.
     ```bash
     $ molecule converge
     ```
 
 - **Destroy molecule test instance**
+
 Tears down an existing molecule test instance already running.
     ```bash
     $ molecule destroy
     ```
 
 - **Run unit testing on playbook run**
+
 Enables to run unit tests against molecule test instance.
     ```bash
     $ molecule verify
     ```
 
 - **Log into molecule instance**
+
 Manually inspect the molecule test instance during testing.
     ```bash
     $ molecule login
