@@ -15,24 +15,24 @@ Example for Ansible role testing with Molecule, Testinfra and Linters.
 
 ##### Molecule Setup
 - In this example, we are using `docker` driver as it closely resembles many practical scenarios of VMs of Cloud computer offerings.
-- Pre-requisites:
-    - Docker (`docker info`)
-    - Python >3.6 (`python --version`)
-    - ansible >2.8 (`ansible --version`)
-    - molecule (`molecule --version`)
-- Python package requirements are included in _requirements.txt_. Installing pre-requisites,
-    ```bash
-    $ pip3 install -r requirements.txt 
-    ```
-- [Optional] Can setup this in Molecule testing in a Python *Virtual environment*. When doing so, install the `molecule-docker` package.
+- [Optional] Molecule testing can be executed inside a Python *Virtual environment*. When doing so, install the `molecule-docker` package.
     ```bash
     $ pip3 install -r requirements.txt 
     $ python3 -m pip install molecule-docker
     ```
+- Pre-requisites:
+    - Docker >=19.03 (`docker info`)
+    - Python >=3.6 (`python --version`)
+    - ansible >=2.8 (`ansible --version`)
+    - molecule >=3.2 (`molecule --version`)
+- Python package requirements are included in _requirements.txt_. Installing pre-requisites,
+    ```bash
+    $ pip3 install -r requirements.txt 
+    ```
 
 ## Step-by-Step instructions
 1. Initialize a new role with Molecule
-    - Can create a new Ansible role using Molecule _**OR**_
+    - Can create a new Ansible role using Molecule, _**OR**_
         ```bash
         $ molecule init role <role_name> --driver-name docker
         $ molecule init role my-new-role --driver-name docker
@@ -43,6 +43,7 @@ Example for Ansible role testing with Molecule, Testinfra and Linters.
         $ cd <role_name>
         $ molecule init scenario -r <role_name> --driver-name docker
         ```
+- **VERY VERY IMPORTANT** Include explanations about _Configuration blocks_ in `molecule.yml`, `converge.yml` and `verify.yml`.
 
 #### Molecule Commands
 All these commands should be run inside the role directory.
