@@ -12,8 +12,8 @@ Example for Ansible role testing with Molecule, Testinfra and Linters to do Unit
 - Most of the Ansible role testing functionality is converged around the `Molecule` tool.
 - `Molecule` is designed to automate all parts of Ansible role testing.
 
-### Ansible Testing Spectrum
-##### 1. YAML Lint
+## Ansible Testing Spectrum
+#### 1. YAML Lint
 -  A linter is a basic static code analyzer, that detect source code for programmatic and stylistic errors by applying a set of guidelines. `yamllint` recursively checks all the yaml files in the current directory.
     ```bash
     $ yamllint .                # Run linter on all files in directory recursively
@@ -22,13 +22,13 @@ Example for Ansible role testing with Molecule, Testinfra and Linters to do Unit
 - Default YAML lint rules can be overridden by placing a `.yamllint` file in the current working directory with required overrides.
 - [YAML Lint rules](https://yamllint.readthedocs.io/en/stable/rules.html)
 
-##### 2. Ansible Syntax check
+#### 2. Ansible Syntax check
 - A passive Ansible level code analysis to validate roles, variable, modules and other integration points without running the playbook. This check doesn't offer in-depth guaranteed insights if the playbook will run without failing. 
     ```bash
     $ ansible-playbook playbook.yml --syntax-check
     ```
 
-##### 3. Ansible Lint
+#### 3. Ansible Lint
 - Test Ansible tasks and playbooks to check if best practices are followed when developing Ansible playbooks. This is a set of guide lines that helps to avoid bad coding practices.
 - This is helpful to encourage developers to follow a uniform set of rules to improve the quality of Ansible playbooks.
 - Also works if playbooks include other playbooks, or tasks, or handlers or roles.
@@ -41,7 +41,11 @@ Example for Ansible role testing with Molecule, Testinfra and Linters to do Unit
 - Default Ansible lint rules can be overridden by placing a `.ansible-lint` file in the current working directory with required overrides.
 - [Ansible Lint Documentation](https://ansible-lint.readthedocs.io/en/latest/)
 
-##### Molecule Setup
+#### 4. Molecule
+- _**MOLECULE OVERVIEW HERE!!!**_
+
+## Molecule Deep-dive
+#### Molecule Setup
 - In this example, we are using `docker` driver as it closely resembles many practical scenarios of VMs of Cloud computer offerings.
 - [Optional] Molecule testing can be executed inside a Python *Virtual environment*. When doing so, install the `molecule-docker` package.
     ```bash
@@ -58,7 +62,7 @@ Example for Ansible role testing with Molecule, Testinfra and Linters to do Unit
     $ pip3 install -r requirements.txt 
     ```
 
-##### Molecule configuration files
+#### Molecule configuration files
 - **VERY VERY IMPORTANT** Include explanations about _Configuration blocks_ in `molecule.yml`, `converge.yml` and `verify.yml`.
 - `molecule.yml`
     - Describes how Molecules will execute the tests.
@@ -69,7 +73,7 @@ Example for Ansible role testing with Molecule, Testinfra and Linters to do Unit
 - `verify.yml`
     - A playbook of tasks to verify and validate the environment after executing the ansible playbook.
 
-## Step-by-Step instructions (Molecule)
+### Step-by-Step instructions (Molecule)
 1. Initialize a new role with Molecule
     - Can create a new Ansible role using Molecule, _**OR**_
         ```bash
@@ -83,7 +87,7 @@ Example for Ansible role testing with Molecule, Testinfra and Linters to do Unit
         $ molecule init scenario -r <role_name> --driver-name docker
         ```
 
-#### Molecule Commands
+### Molecule Commands
 _**NOTE:**_ All these commands should be run inside the role directory.
 - **Testing role with default test matrix**
     - Better suited to test a role once it’s complete rather than in developing phase.
@@ -143,7 +147,7 @@ _**NOTE:**_ All these commands should be run inside the role directory.
     - CI Molecule testing is generally done and is recommended during development of Ansible roles and committing to repository during *push* and *pull request* actions.
 4. Running playbooks on different OS distributions
     - [Jeff Geerling](https://ansible.jeffgeerling.com/) @geerlingguy maintains a great set of Docker images of different OS platforms ideal to run Molecule testing for Ansible playbooks.
-    - Switching the OS one at a time
+    1. _Switching the OS one at a time_
         - The OS platform running the molecule testing can be switched by passing an environment variable to define the OS distribution in `molecule.yml`.
             ```yaml
             ...
@@ -161,7 +165,7 @@ _**NOTE:**_ All these commands should be run inside the role directory.
             ```bash
             $ MOLECULE_DISTRO=debian10 molecule converge
             ```
-    - Run testing on multiple OS distributions simultaneously
+    2. _Run testing on multiple OS distributions simultaneously_
         - Include the list of OS distribution config settings in _**platform**_ block of the `molecule.yml` file. A common config scenario is shown below. Running `molecule converge` will create test instances for all distributions and execute the playbook simultaneously.
             ```yaml
             ...
@@ -195,7 +199,7 @@ _**NOTE:**_ All these commands should be run inside the role directory.
     - The default _**verifier**_ used by Molecule is _ansible_ (define tests as Ansible tasks). Molecule also support other verifiers _**Testinfra**_ to run unit testing on Ansible playbooks.
 
 
-### Follow up:
+#### Follow up:
 - [Ansible lint for Github Actions](https://ansible-lint.readthedocs.io/en/latest/usage.html#ci-cd)
 
 ## References
