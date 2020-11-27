@@ -217,6 +217,9 @@ _**NOTE:**_ All these commands should be run inside the role directory.
         ...
         ```
     - Rule overrides for `.yamllint` and `.ansible-lint` can be included in the root path of the role.
+7. Continuous integration (CI) Molecule testing with GitHub Actions
+- Generally CI testing actions are set to trigger during *push* and *pull request* to the main branches.
+
 
 #### Follow up:
 - [Ansible lint for Github Actions](https://ansible-lint.readthedocs.io/en/latest/usage.html#ci-cd)
