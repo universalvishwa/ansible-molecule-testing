@@ -117,7 +117,9 @@ _**NOTE:**_ All these commands should be run inside the role directory.
 - **Log into molecule instance**
     - Manually inspect the molecule test instance during testing.
         ```bash
-        $ molecule login
+        $ molecule login                          # Single platform
+        $ molecule login --host <platform_name>   # Multi platform
+        $ molecule login --host centos8
         ```
 - **Run linters on Ansible playbooks code**
     - Supports passing multiple linters to be applied on the code.
@@ -218,8 +220,17 @@ _**NOTE:**_ All these commands should be run inside the role directory.
         ```
     - Rule overrides for `.yamllint` and `.ansible-lint` can be included in the root path of the role.
 7. Continuous integration (CI) Molecule testing with GitHub Actions
-- Generally CI testing actions are set to trigger during *push* and *pull request* to the main branches.
-- A build strategy/matrix can be used to run Molecule test on multiple OS platforms.
+    - Generally CI testing actions are set to trigger during *push* and *pull request* to the main branches.
+    - A build strategy/matrix can be used to run Molecule test on multiple OS platforms.
+    - Add colour to Python and Ansible outputs with the following environment variables.
+        ```yaml
+        ...
+        env:
+            PY_COLORS: '1'                          # Molecule colors
+            ANSIBLE_FORCE_COLOR: '1'                # Ansible colors
+            MOLECULE_DISTRO: ${{ matrix.distro }}   # Switch OS platform of testing
+        ...
+        ```
 
 #### Follow up:
 - [Ansible lint for Github Actions](https://ansible-lint.readthedocs.io/en/latest/usage.html#ci-cd)
