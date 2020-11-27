@@ -5,6 +5,7 @@ name: CI
   push:
     branches:
       - master
+      - dev
 
 jobs:
   Ansible-role-test:
@@ -32,11 +33,13 @@ jobs:
       - name: Run a one-line script
         run: |
           echo Hello, world!
-          ls
+          ls -la
 
-      # - name: Run Molecule tests.
-      #   run: molecule test
-      #   env:
-      #     PY_COLORS: '1'
-      #     ANSIBLE_FORCE_COLOR: '1'
-      #     MOLECULE_DISTRO: ${{ matrix.distro }}
+      - name: Run Molecule tests.
+        run: |
+          cd myrole
+          molecule test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro }}
