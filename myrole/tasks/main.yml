@@ -1,0 +1,43 @@
+---
+# tasks file for myrole
+- name: print the distribution and version
+  debug: msg="{{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+- name: print the OS family
+  debug: msg="{{ ansible_os_family }}"
+
+# - debug:
+#     var: '{{ ansible_of_family }}'
+
+# - name: Override Apache vars for Redhat
+#   set_fact:
+#     apache_package: httpd
+#     apache_service: httpd
+#   when: ansible_facts['os_family'] == 'RedHat'
+
+# - name: Update apt cache for Debian
+#   apt:
+#     update_cache: true
+#     cache_valid_time: 3600
+#   when: (ansible_facts['os_family'] == 'Debian')
+
+- name: Install Apache
+  package:
+    name: "{{ apache_package }}"
+    state: present
+
+- name: Copy web page
+  copy:
+    content: |
+      <html>
+      <head><title>Hello Molecules</title></head>
+      <body>Hello little Molecules</body>
+      </html>
+    dest: /var/www/html/index.html
+  notify: restart apache
+
+- name: Start apache service
+  service:
+    name: "{{ apache_service }}"
+    state: started
+    enabled: true

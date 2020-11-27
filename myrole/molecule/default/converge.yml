@@ -1,0 +1,21 @@
+---
+- name: Converge
+  hosts: all
+  pre_tasks:
+    - name: Override Apache vars for Redhat
+      set_fact:
+        apache_package: httpd
+        apache_service: httpd
+      when: ansible_facts['os_family'] == 'RedHat'
+    - name: Update apt cache for Debian
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_facts['os_family'] == 'Debian'
+  # vars:
+  #   apache_package: apache2
+  #   apache_service: apache2
+  tasks:
+    - name: "Include myrole"
+      include_role:
+        name: "myrole"
