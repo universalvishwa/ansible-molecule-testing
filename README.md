@@ -42,7 +42,9 @@ Example for Ansible role testing with Molecule, Testinfra and Linters to do Unit
 - [Ansible Lint Documentation](https://ansible-lint.readthedocs.io/en/latest/)
 
 #### 4. Molecule
+- Molecule supports integrating with CI environments to run unit test on Ansible playbooks when committing to repositories during *push* and *pull request* actions.
 - _**MOLECULE OVERVIEW HERE!!!**_
+
 
 ## Molecule Deep-dive
 #### Molecule Setup
@@ -116,6 +118,11 @@ _**NOTE:**_ All these commands should be run inside the role directory.
     - Manually inspect the molecule test instance during testing.
         ```bash
         $ molecule login
+        ```
+- **Run linters on Ansible playbooks code**
+    - Supports passing multiple linters to be applied on the code.
+        ```bash
+        $ molecule lint
         ```
 
 ### Notes
@@ -197,7 +204,19 @@ _**NOTE:**_ All these commands should be run inside the role directory.
     - Use the `verify.yml` to define actions as Ansible tasks that can be use to validate the playbooks executed.
         - e.g. Required services running, application service traffic, configuration values set etc.
     - The default _**verifier**_ used by Molecule is _ansible_ (define tests as Ansible tasks). Molecule also support other verifiers _**Testinfra**_ to run unit testing on Ansible playbooks.
-
+6. Running linters on Ansible playbooks with Molecule
+    - Molecule allows running one or more linters as a part of the Ansible playbook testing through a script block.
+    - This allows to run Linting as part of CI pipeline.
+    - Add the following block to run linters and fail if not up to requirements,
+        ```yaml
+        ...
+        lint: |
+            set -e
+            yamllint .
+            ansible-lint
+        ...
+        ```
+    - Rule overrides for `.yamllint` and `.ansible-lint` can be included in the root path of the role.
 
 #### Follow up:
 - [Ansible lint for Github Actions](https://ansible-lint.readthedocs.io/en/latest/usage.html#ci-cd)
@@ -208,5 +227,6 @@ _**NOTE:**_ All these commands should be run inside the role directory.
 - [yamllint documentation](https://yamllint.readthedocs.io/en/stable/index.html)
 - [Ansible 101 - Episode 7 - Molecule Testing and Linting and Ansible Galaxy](https://youtu.be/FaXVZ60o8L8)
 - [Ansible 101 - Episode 8 - Playbook testing with Molecule and GitHub Actions CI](https://youtu.be/CYghlf-6Opc)
+- [Testing your Ansible roles with Molecule](https://www.jeffgeerling.com/blog/2018/testing-your-ansible-roles-molecule)
 - [Rapidly Build & Test Ansible Roles with Molecule + Docker](https://www.toptechskills.com/ansible-tutorials-courses/rapidly-build-test-ansible-roles-molecule-docker/)
 - [Container Images for Ansible Testing](https://ansible.jeffgeerling.com/#container-images-testing)

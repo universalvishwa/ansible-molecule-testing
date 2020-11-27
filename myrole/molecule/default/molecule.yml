@@ -3,6 +3,10 @@ dependency:
   name: galaxy
 driver:
   name: docker
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
 platforms:
   # Switching the OS one at a time
   # - name: centos8
