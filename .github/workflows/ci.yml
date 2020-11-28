@@ -26,17 +26,13 @@ jobs:
           python-version: '3.x'
 
       - name: Install test dependencies.
-        run: pip3 install molecule docker yamllint ansible-lint
+        run: pip3 install molecule docker molecule-docker yamllint ansible-lint
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
+      - name: Run Molecule tests.
         run: |
-          echo Hello, world!
-          ls
-
-      # - name: Run Molecule tests.
-      #   run: molecule test
-      #   env:
-      #     PY_COLORS: '1'
-      #     ANSIBLE_FORCE_COLOR: '1'
-      #     MOLECULE_DISTRO: ${{ matrix.distro }}
+          cd myrole
+          molecule test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro }}
