@@ -1,0 +1,4 @@
+---
+# .ansible-lint  
+warn_list:  # or 'skip_list:' to silence them completely
+  - '601'  # Don't compare to literal True/False

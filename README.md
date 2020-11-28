@@ -143,12 +143,12 @@ Repo Link: [ansible-molecule-testing-tldr](https://github.com/universalvishwa/an
 
               - name: Run Molecule tests.
                 run: |
-                cd myrole
-                molecule test
+                  cd myrole
+                  molecule test
                 env:
-                PY_COLORS: '1'
-                ANSIBLE_FORCE_COLOR: '1'
-                MOLECULE_DISTRO: ${{ matrix.distro }}
+                  PY_COLORS: '1'
+                  ANSIBLE_FORCE_COLOR: '1'
+                  MOLECULE_DISTRO: ${{ matrix.distro }}
         ```
 
 ### Ansible Testing Spectrum
@@ -185,19 +185,18 @@ Repo Link: [ansible-molecule-testing-tldr](https://github.com/universalvishwa/an
 
 ## Molecule Deep-dive
 #### 1. Molecule configuration files
-**VERY VERY IMPORTANT** Include explanations about _Configuration blocks_ in `molecule.yml`, `converge.yml` and `verify.yml`.
 - **`molecule.yml`**
-    - Describes how Molecules will execute the tests.
-    - Set dependant roles, platform and driver (e.g. Docker, vagrant etc.) and unit tests
+    - Describes how Molecule will execute the tests.
+    - Set dependant roles, platform, linters, driver (e.g. Docker, vagrant etc.) and unit tests
 - **`converge.yml`**
     - An Ansible playbook that specifies the Ansible role in interest.
     - Can include additional tasks (pre-tasks and post-tasks) required to test the playbook. e.g. Update package cache
 - **`verify.yml`**
-    - A playbook or tasks to verify and validate the environment after executing the ansible playbook.
+    - A playbook, tasks or _testinfra_ script to verify and validate the environment after executing the ansible playbook.
 
 #### 2. Setup Molecule environment
-- This example demonstrate using `docker` driver as it closely resembles many practical scenarios of VMs of Cloud computer offerings.
-- [Optional] Molecule testing can be executed inside a Python *Virtual environment*. When doing so, install the `molecule-docker` package.
+- This example demonstrate using `docker` driver as it closely resembles many practical scenarios of VMs of cloud compute offerings.
+- [Optional] Molecule testing can be executed inside a Python *Virtual environment*.
     ```bash
     $ python3 -m venv venv
     $ source venv/bin/activate
@@ -231,7 +230,7 @@ This creates the Molecule configuration files structure
 ### Molecule Commands
 _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
 - **Run full Testing lifecyle on the role**
-    - Testing role with default test matrix
+    - Test role with default test matrix
     - Better suited to test a role once it’s development complete rather than in developing phase.
         ```bash
         $ molecule test
@@ -264,7 +263,7 @@ _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
         $ molecule login --host <platform_name>   # Multi platform
         $ molecule login --host centos8
         ```
-- **Run linters on Ansible playbooks code**
+- **Run linters on Ansible role code**
     - Supports passing multiple linters to be applied on the code. e.g `yamllint`, `ansible-lint`
         ```bash
         $ molecule lint
@@ -272,9 +271,11 @@ _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
 
 ### Important Notes
 1. **Importing roles from Ansible Galaxy**
-    - Install Ansible Galaxy roles into a global location in the system such that the role can be shared by other Ansible playbooks. _**OR**_
-        `ansible-galaxy install <galaxy_role_name>`
-    - To install the Galaxy role in the same directory as the playbook. Create a `ansible.cfg` file in the parent directory of the Ansible role with the following.
+    - Install Ansible Galaxy roles into a global (shared) location in the system. _**OR**_
+        ```bash
+        $ ansible-galaxy install <galaxy_role_name>
+        ```
+    - To install Ansible Galaxy roles in the same directory as the playbook, create a `ansible.cfg` file in the parent directory of the Ansible role with the following.
         ```ini
         [default]
         roles_path = ./roles
@@ -297,7 +298,7 @@ _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
     - Use `pre_tasks` in playbooks to set parameters or validate the environment of the host before running the primary roles/tasks.
     - These actions can be included in **prepare** stage of the `molecule.yml` configuration file.
 4. **Testing roles on different OS distributions**
-    - [Jeff Geerling](https://ansible.jeffgeerling.com/) ([@geerlingguy](https://github.com/geerlingguy)) maintains a great set of Docker images of different OS platforms ideal to run Molecule testing for Ansible playbooks.
+    - [Jeff Geerling](https://ansible.jeffgeerling.com/) ([@geerlingguy](https://github.com/geerlingguy)) maintains a great set of Docker images of different OS platforms ideal to run Molecule testing for Ansible roles.
     1. _Switching the OS one at a time_
         - The OS platform running the molecule testing can be switched by passing an environment variable to define the OS distribution in `molecule.yml`.
             ```yaml
@@ -318,7 +319,7 @@ _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
             $ MOLECULE_DISTRO=debian10 molecule converge
             ```
     2. _Run testing on multiple OS distributions simultaneously_
-        - Include the list of OS distribution config settings in _**platforms**_ block of the `molecule.yml` file.
+        - Include the list of OS distribution settings in _**platforms**_ block of the `molecule.yml` file.
         - Running `molecule converge` will create test instances for all distributions and execute the playbook simultaneously.
         - A common config scenario is shown below.
             ```yaml
@@ -351,10 +352,10 @@ _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
     - Use the `verify.yml` to define actions as Ansible tasks (or an entire playbook using `include_role`) that can be use to validate the playbooks executed.
         - e.g. Required services running, application service traffic, configuration values set etc.
     - The default _**verifier**_ used by Molecule is _ansible_ (i.e. define tests as Ansible tasks).
-    - Molecule also support other verifiers _**Testinfra**_ to run unit testing on Ansible playbooks.
+    - Molecule also support other verifier, _**Testinfra**_ to run unit testing on Ansible playbooks.
 6. **Running linters on Ansible playbooks with Molecule**
     - Molecule allows running one or more linters as a part of the playbook testing through a script block.
-    - This avoids the need to run Linting as part of CI pipeline.
+    - This avoids the need to run Linting as part of CI pipeline separately.
     - Rule overrides for `.yamllint` and `.ansible-lint` should be included in the root path of the role.
     - Add the following block to run linters and fail if not up to requirements,
         ```yaml
@@ -379,9 +380,9 @@ _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
         ...
         ```
 8. **Continuous integration (CI) Molecule testing with GitHub Actions**
-    - Generally Molecule testing is integrated with CI testing action triggers during *push* and *pull request* to the main branches.
+    - Generally Molecule testing is integrated with CI testing action triggers during *push* and *pull requests* to main branches.
     - Morevover, Molecule testing is also executed during development of Ansible roles in addition to CI testing actions.
-    - A build strategy/matrix can be used to run Molecule testing on multiple OS platforms.
+    - A build strategy/matrix can be used to run Molecule testing on multiple OS platforms with the use of _**platforms**_ config setting in `molecule.yml`.
     - Add colours to Python and Ansible outputs by setting the following environment variables.
         ```yaml
         ...
