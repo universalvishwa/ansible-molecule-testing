@@ -11,6 +11,146 @@ Example for Ansible role testing with Molecule, Testinfra and Linters to do Unit
     - Parallel infrastructure
 - Majority of the Ansible role testing functionality can be converged within _Molecule_.
 
+## TL;DR Creating Ansible roles with Molecule Testing
+Repo Link: [ansible-molecule-testing-tldr](https://github.com/universalvishwa/ansible-molecule-testing-tldr)
+1. Create Virtual environment and install Python dependencies
+    ```bash
+    $ python3 -m venv venv
+    $ source venv/bin/activate
+    $ pip3 install -r requirements.txt 
+    ```
+2. Create Ansible role using Molecule 
+    ```bash
+    $ molecule init role <role_name> --driver-name docker
+    ```
+3. Update the _metadata_ for Ansible role
+    - Complete the `meta/main.yml` with appropriate details. **OR**
+    - Delete this folder completely to avoid linting errors.
+4. Configure `molecule.yml` configuration file
+    - _**dependency**_: Add dependent collections/roles to `molecule/default/requirements.yml`
+    - _**driver**_: Set the driver for infrastructure to `docker`
+    - _**lint**_: Configure linter script (`yamllint`, `ansible-lint`) and place the rule override files in root path of role.
+    - _**platforms**_: Set the Dockerized OS distribution platform(s) to run Molecule test
+    - _**verifier**_: Set verification provider use to validate the test environment. `ansible`(default), `testinfra`
+    - Example of a `molecule.yml` file,
+        ```yaml
+        ---
+        dependency:
+          name: galaxy
+          options:
+            ignore-certs: true
+            requirements-file: requirements.yml
+            role-file: requirements.yml
+        driver:
+          name: docker
+        lint: |
+          set -e
+          yamllint .
+          ansible-lint
+        platforms:
+          - name: centos8
+            image: geerlingguy/docker-centos8-ansible:latest
+            command: ""
+            volumes:
+              - /sys/fs/cgroup:/sys/fs/cgroup:ro
+            privileged: true
+            pre_build_image: true
+          - name: ubuntu2004
+            image: "geerlingguy/docker-ubuntu2004-ansible:latest"
+            command: ""
+            volumes:
+              - /sys/fs/cgroup:/sys/fs/cgroup:ro
+            privileged: true
+            pre_build_image: true
+          - name: debian10
+            image: geerlingguy/docker-debian10-ansible:latest
+            command: ""
+            volumes:
+              - /sys/fs/cgroup:/sys/fs/cgroup:ro
+            privileged: true
+            pre_build_image: true
+        provisioner:
+          name: ansible
+        verifier:
+          name: ansible
+        ```
+4. Configure `converge.yml`
+    - Add `pre_tasks` and `vars` (static variables) to converge playbook.
+5. Proceed with writing code for the Ansible role
+    - Populate `tasks/`, `handlers/`, `vars/`, `defaults/` etc...
+6. Create Molecule Test instance and run playbook
+    ```bash
+    $ cd <role_name>
+    $ molecule converge
+    ```
+7. Add Ansible Tasks, playbooks or Testinfra script to `verify.yml` to validate the Molecule test instance.
+    - This can be individual tasks or a separate playbook. **OR**
+    - Testinfra script
+8. Run the validation tests on the Molecule instance to verify the code
+    ```bash
+    $ cd <role_name>
+    $ molecule verify
+    ```
+9. Follow this cycle process iteratively by adding new code to the role followed by running `molecule converge` and `molecule verify` until the code for the role is code complete.
+    - If there is a need to recreate the Molecule testing during development phase use `molecule destroy` terminate test instance and start from a clean slate.
+        ```bash
+        $ molecule converge
+        $ molecule verify
+        $ molecule destroy
+        ```
+    - If required to log into the Molecule testing instance during development use `molecule login`,
+        ```bash
+        $ molecule login --host <platform_name>
+        ```
+    - Ansible modules `fail`, `debug` and `assert` can be use to extract certain information or set breakpoints to troubleshoot errors.
+10. After role development is complete run a full Molecule test life cycle.
+    ```bash
+    $ molecule test
+    ```
+11. Molecule testing with GitHub Actions (CI)
+    - Create the workflow to trigger during *push* and *pull requests* to main branches.
+    - Example of YAML configuration file for Github Action workflow CI testing `.github/workflow/ci.yml`,
+        ```yaml
+        ---
+        name: CI
+        'on':
+          pull_request:
+          push:
+            branches:
+              - master
+
+        jobs:
+          Ansible-role-test:
+            name: Molecule
+            runs-on: ubuntu-latest
+            strategy:
+              matrix:
+                distro:
+                  - centos8
+                  - ubuntu2004
+                  - debian10
+            steps:
+              - name: Check out the codebase.
+                uses: actions/checkout@v2
+
+              - name: Set up Python 3.
+                uses: actions/setup-python@v2
+                with:
+                python-version: '3.x'
+
+              - name: Install test dependencies.
+                run: pip3 install -r requirements.txt
+
+              - name: Run Molecule tests.
+                run: |
+                cd myrole
+                molecule test
+                env:
+                PY_COLORS: '1'
+                ANSIBLE_FORCE_COLOR: '1'
+                MOLECULE_DISTRO: ${{ matrix.distro }}
+        ```
+
 ### Ansible Testing Spectrum
 #### 1. YAML Lint
 -  A linter is a basic static code analyzer, that detect source code for programmatic and stylistic errors by applying a set of guidelines. `yamllint` recursively checks all the yaml files in the current directory.
@@ -39,7 +179,7 @@ Example for Ansible role testing with Molecule, Testinfra and Linters to do Unit
 - Default Ansible lint rules can be overridden by placing a `.ansible-lint` file in the current working directory with required overrides.
 
 #### 4. Molecule
-- Molecule supports integrating with CI environments to run unit test on Ansible playbooks when committing to repositories during *push* and *pull request* actions.
+- Molecule supports integrating with CI environments to run unit test on Ansible playbooks when committing to repositories during *push* and *pull requests* actions.
 - _Molecule_ is designed to automate all parts of Ansible role testing.
 
 
@@ -53,13 +193,14 @@ Example for Ansible role testing with Molecule, Testinfra and Linters to do Unit
     - An Ansible playbook that specifies the Ansible role in interest.
     - Can include additional tasks (pre-tasks and post-tasks) required to test the playbook. e.g. Update package cache
 - **`verify.yml`**
-    - A playbook of tasks to verify and validate the environment after executing the ansible playbook.
+    - A playbook or tasks to verify and validate the environment after executing the ansible playbook.
 
 #### 2. Setup Molecule environment
 - This example demonstrate using `docker` driver as it closely resembles many practical scenarios of VMs of Cloud computer offerings.
 - [Optional] Molecule testing can be executed inside a Python *Virtual environment*. When doing so, install the `molecule-docker` package.
     ```bash
     $ python3 -m venv venv
+    $ source venv/bin/activate
     $ pip3 install -r requirements.txt 
     $ python3 -m pip install molecule-docker
     ```
@@ -78,7 +219,7 @@ This creates the Molecule configuration files structure
 1. Create a new Ansible role using Molecule, _**OR**_
     ```bash
     $ molecule init role <role_name> --driver-name docker
-    $ molecule init role my-new-role --driver-name docker
+    $ molecule init role myrole --driver-name docker
     ```
 2. Initializing Molecule within an existing Ansible role,
     ```bash
@@ -94,6 +235,11 @@ _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
     - Better suited to test a role once it’s development complete rather than in developing phase.
         ```bash
         $ molecule test
+        ```
+- **Create molecule test instance**
+    - Create Molecule test instance without running the Ansible role.
+        ```bash
+        $ molecule create
         ```
 - **Run playbooks in molecule test environment**
     - Converge step allows to re-run the playbook on the test molecule instance without needing to create/destroy the instances every time. This allows to test the role rapidly during the role development workflow to allowing fastest possible iterations.
@@ -157,11 +303,11 @@ _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
             ```yaml
             ...
             platforms:
-            - name: centos8
+              - name: centos8
                 image: geerlingguy/docker-${MOLECULE_DISTRO:-centos8}-ansible:latest
                 command: ""
                 volumes:
-                - /sys/fs/cgroup:/sys/fs/cgroup:ro
+                  - /sys/fs/cgroup:/sys/fs/cgroup:ro
                 privileged: true
                 pre_build_image: true
             ...
@@ -178,31 +324,31 @@ _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
             ```yaml
             ...
             platforms:
-            - name: centos8
+              - name: centos8
                 image: geerlingguy/docker-centos8-ansible:latest
                 command: ""
                 volumes:
-                - /sys/fs/cgroup:/sys/fs/cgroup:ro
+                  - /sys/fs/cgroup:/sys/fs/cgroup:ro
                 privileged: true
                 pre_build_image: true
-            - name: ubuntu2004
+              - name: ubuntu2004
                 image: "geerlingguy/docker-ubuntu2004-ansible:latest"
                 command: ""
                 volumes:
-                - /sys/fs/cgroup:/sys/fs/cgroup:ro
+                  - /sys/fs/cgroup:/sys/fs/cgroup:ro
                 privileged: true
                 pre_build_image: true
-            - name: debian10
+              - name: debian10
                 image: geerlingguy/docker-debian10-ansible:latest
                 command: ""
                 volumes:
-                - /sys/fs/cgroup:/sys/fs/cgroup:ro
+                  - /sys/fs/cgroup:/sys/fs/cgroup:ro
                 privileged: true
                 pre_build_image: true
             ...
             ```
 5. **Verification and validation on hosts after running playbooks**
-    - Use the `verify.yml` to define actions as Ansible tasks that can be use to validate the playbooks executed.
+    - Use the `verify.yml` to define actions as Ansible tasks (or an entire playbook using `include_role`) that can be use to validate the playbooks executed.
         - e.g. Required services running, application service traffic, configuration values set etc.
     - The default _**verifier**_ used by Molecule is _ansible_ (i.e. define tests as Ansible tasks).
     - Molecule also support other verifiers _**Testinfra**_ to run unit testing on Ansible playbooks.
@@ -214,12 +360,25 @@ _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
         ```yaml
         ...
         lint: |
-            set -e
-            yamllint .
-            ansible-lint
+          set -e
+          yamllint .
+          ansible-lint
         ...
         ```
-7. **Continuous integration (CI) Molecule testing with GitHub Actions**
+7. **Setting Role dependencies with Ansible Galaxy**
+    - If the Ansible role has any dependencies (role, collections), add a `molecule/default/requirements.yml` and Molecule will automatically run ansible-galaxy to download them on the test instance.
+    - Set the **dependency** configuration block in `converge.yml` as follows,
+        ```yaml
+        ...
+        dependency:
+          name: galaxy
+          options:
+            ignore-certs: true
+            requirements-file: requirements.yml
+            role-file: requirements.yml
+        ...
+        ```
+8. **Continuous integration (CI) Molecule testing with GitHub Actions**
     - Generally Molecule testing is integrated with CI testing action triggers during *push* and *pull request* to the main branches.
     - Morevover, Molecule testing is also executed during development of Ansible roles in addition to CI testing actions.
     - A build strategy/matrix can be used to run Molecule testing on multiple OS platforms.
@@ -227,15 +386,11 @@ _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
         ```yaml
         ...
         env:
-            PY_COLORS: '1'                          # Molecule colors
-            ANSIBLE_FORCE_COLOR: '1'                # Ansible colors
-            MOLECULE_DISTRO: ${{ matrix.distro }}   # Switch OS platform of testing
+          PY_COLORS: '1'                          # Molecule colors
+          ANSIBLE_FORCE_COLOR: '1'                # Ansible colors
+          MOLECULE_DISTRO: ${{ matrix.distro }}   # Switch OS platform of testing
         ...
         ```
-
-#### TO DO:
-- Explore **dependency** block of `molecule.yml`
-- TL:DR topic with steps to quickly setup an Ansible role.
 
 ## References
 - [Ansible Molecule](https://molecule.readthedocs.io/en/latest/)
@@ -247,3 +402,4 @@ _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
 - [Testing your Ansible roles with Molecule](https://www.jeffgeerling.com/blog/2018/testing-your-ansible-roles-molecule)
 - [Rapidly Build & Test Ansible Roles with Molecule + Docker](https://www.toptechskills.com/ansible-tutorials-courses/rapidly-build-test-ansible-roles-molecule-docker/)
 - [Container Images for Ansible Testing](https://ansible.jeffgeerling.com/#container-images-testing)
+- [Ansible Testing Using Molecule with Ansible as Verifier](https://www.adictosaltrabajo.com/2020/05/08/ansible-testing-using-molecule-with-ansible-as-verifier/)
