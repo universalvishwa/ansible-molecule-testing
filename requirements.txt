@@ -4,3 +4,4 @@ molecule
 molecule-docker
 docker
 yamllint
+testinfra

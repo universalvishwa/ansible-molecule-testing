@@ -1,7 +1,7 @@
 ---
 roles:
-  - name: geerlingguy.docker
-    version: 2.9.0
+  - name: geerlingguy.apache
+    version: 3.1.4
   - name: xanmanning.k3s
     version: v1.17.4
   # - name: geerlingguy.docker_arm
