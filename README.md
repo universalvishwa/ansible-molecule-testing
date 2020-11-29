@@ -277,7 +277,7 @@ _**NOTE:**_ All these commands _**must**_ be run inside the role directory.
         ```
     - To install Ansible Galaxy roles in the same directory as the playbook, create a `ansible.cfg` file in the parent directory of the Ansible role with the following.
         ```ini
-        [default]
+        [defaults]
         roles_path = ./roles
         ```
     - When `roles_path` is overridden, use a `requirements.yml` file to define the Ansible Galaxy roles to download. Install Galaxy roles by executing,
