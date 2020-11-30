@@ -1,6 +1,8 @@
 # Ansible Molecule Testing
 Example for Ansible role testing with Molecule, Testinfra and Linters to do Unit, integration and functional testing.
 
+[![CI](https://github.com/universalvishwa/ansible-molecule-testing/workflows/CI/badge.svg)](https://github.com/universalvishwa/ansible-molecule-testing/actions)
+
 ## Overview
 - Ansible testing spectrum: This repository contains details on how to test an Ansible role using over a number of aspects,
     - yamllint
